@@ -1,0 +1,34 @@
+sdk-version: 1.18.1
+name: FridgeApp
+version: 0.1.0
+source: daml
+init-script: Main:setup
+parties:
+- Family
+- Fridge
+dependencies:
+- daml-prim
+- daml-stdlib
+- daml-trigger
+sandbox-options:
+- --wall-clock-time
+- --ledgerid=FridgeApp-sandbox
+start-navigator: true
+codegen:
+  js:
+    output-directory: ui/daml.js
+    npm-scope: daml.js
+
+
+# sdk-version: 1.16.0
+# name: FridgeApp
+# source: daml
+# init-script: Main:setup
+# parties:
+# - Family
+# - Fridge
+# - Kramer
+# dependencies:
+# - daml-prim
+# - daml-stdlib
+# - daml-trigger

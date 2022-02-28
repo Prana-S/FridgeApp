@@ -1,0 +1,55 @@
+module Main where
+
+import Daml.Script
+
+type ItemCustodyId = ContractId ItemCustody
+
+template ItemCustody
+    with
+        owner : Party
+        custodian : Party
+        itemName : Text
+        price : Text --shutter click
+    where
+        signatory owner
+
+        controller owner can
+            ReleaseItemTo : ItemCustodyId
+                with
+                    friend : Party
+                    currentprice : Text
+                do
+                    create this with
+                        custodian = friend
+                        price = currentprice
+
+        controller custodian can
+            Expired : ItemCustodyId
+                with
+                    rightfulOwner : Party
+                    currentprice : Text
+                do
+                    create this with
+                        custodian = rightfulOwner
+                        price = currentprice
+
+
+--test
+
+setup : Script ItemCustodyId
+setup = script do
+    family <- allocateParty "Family"
+    fridge <- allocateParty "Fridge"
+
+    brandNewFood <- submit family do
+        createCmd ItemCustody with
+            owner = family
+            custodian = family
+            itemName = "Really Expensive Food"
+            price = "Item Price"
+
+    fridgeHasFood <- submit family do
+        exerciseCmd brandNewFood ReleaseItemTo with friend = fridge, currentprice = "Price"
+    
+    submit fridge do
+        exerciseCmd fridgeHasFood Expired with rightfulOwner = family, currentprice = "Price"
